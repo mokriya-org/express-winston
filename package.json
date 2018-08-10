@@ -28,9 +28,12 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha --reporter spec",
+    "format": "prettier-standard '**/*.js' && standard --fix",
+    "test": "npm run test:style && npm run test:unit",
     "test-travis": "node_modules/.bin/mocha --require blanket --reporter travis-cov",
-    "test-coverage": "node_modules/.bin/mocha --require blanket --reporter html-cov > coverage.html || true"
+    "test-coverage": "node_modules/.bin/mocha --require blanket --reporter html-cov > coverage.html || true",
+    "test:style": "standard",
+    "test:unit": "node_modules/.bin/mocha --reporter spec"
   },
   "config": {
     "travis-cov": {
@@ -54,7 +57,9 @@
     "blanket": "^1.2.2",
     "mocha": "^5.2.0",
     "node-mocks-http": "^1.5.1",
+    "prettier-standard": "^8.0.1",
     "should": "^13.2.3",
+    "standard": "^11.0.1",
     "travis-cov": "^0.2.5",
     "winston": ">=3.x <4",
     "winston-transport": "^4.2.0"
