@@ -57,10 +57,10 @@
     "promise": "^7.1.1",
     "should": "^8.2.2",
     "travis-cov": "^0.2.5",
-    "winston": ">=1.x"
+    "winston": ">=1.x <3"
   },
   "peerDependencies": {
-    "winston": ">=1.x"
+    "winston": ">=1.x <3"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -82,6 +82,10 @@
     {
       "name": "Quentin Rossetti",
       "email": "quentin.rossetti@gmail.com"
+    },
+    {
+      "name": "Michael Haberman",
+      "email": "michael@haberman.io"
     },
     {
       "name": "Robbie Trencheny",

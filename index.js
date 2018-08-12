@@ -60,6 +60,15 @@ exports.responseWhitelist = ['statusCode'];
  */
 exports.ignoredRoutes = [];
 
+
+/**
+ * Will log the entire response body only in case that responseWhitelist will contain body.
+ * Keep in mind that logging the entire response means that we will buffer in memory the entire response.
+ * @type {Boolean}
+ */
+
+exports.fullResponseLog = false
+
 /**
  * A default function to filter the properties of the req object.
  * @param req
@@ -198,6 +207,7 @@ exports.logger = function logger(options) {
     options.ignoreRoute = options.ignoreRoute || function () { return false; };
     options.skip = options.skip || exports.defaultSkip;
     options.dynamicMeta = options.dynamicMeta || function(req, res) { return null; };
+    options.fullResponseLog = options.fullResponseLog || false;
 
     var expressMsgFormat = "{{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms";
     if (options.colorize) {
@@ -219,6 +229,17 @@ exports.logger = function logger(options) {
         var currentUrl = req.originalUrl || req.url;
         if (currentUrl && _.includes(options.ignoredRoutes, currentUrl)) return next();
         if (options.ignoreRoute(req, res)) return next();
+
+        var originalWrite = res.write;
+
+        var responseBuffer = [];
+
+        if (options.fullResponseLog && _.includes(options.responseWhitelist, 'body')) {
+          res.write = function (chunk) {
+            responseBuffer.push(chunk);
+            originalWrite.apply(res, arguments);
+          };
+        }
 
         req._startTime = (new Date);
 
@@ -257,7 +278,12 @@ exports.logger = function logger(options) {
                   var isJson = (res._headers && res._headers['content-type']
                     && res._headers['content-type'].indexOf('json') >= 0);
 
-                  logData.res.body = bodyToString(chunk, isJson);
+                  if (options.fullResponseLog) {
+                    responseBuffer.push(chunk);
+                    logData.res.body = bodyToString(responseBuffer, isJson);
+                  } else {
+                    logData.res.body = bodyToString(chunk, isJson);
+                  }
                 }
               }
 
@@ -353,7 +379,13 @@ function safeJSONParse(string) {
 }
 
 function bodyToString(body, isJSON) {
-    var stringBody = body && body.toString();
+    var stringBody;
+    if (_.isArray(body)) {
+        stringBody = body.join('');
+    } else {
+        stringBody = body && body.toString();
+    }
+
     if (isJSON) {
         return (safeJSONParse(body) || stringBody);
     }

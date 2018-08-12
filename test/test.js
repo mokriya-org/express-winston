@@ -1305,6 +1305,44 @@ describe('express-winston', function () {
 
   });
 
+  describe('.fullResponseLog', function() {
+    it('should be a Boolean', function () {
+      expressWinston.fullResponseLog.should.be.a.Boolean();
+    });
+
+    it('should log the entire response', function () {
+      var options = {
+        loggerOptions: {
+          fullResponseLog: true,
+          responseWhitelist: ['body'],
+          next: function (req, res, next) {
+            res.write('{ "message":');
+            res.end(' "Hi!  I\'m a chunk!" }');
+          }
+        }
+      };
+      return loggerTestHelper(options).then(function (result) {
+        result.log.meta.res.should.eql({ body: '{ "message": "Hi!  I\'m a chunk!" }' });
+      });
+    });
+
+    it('should not log the response body when not whitelisted', function () {
+      var options = {
+        loggerOptions: {
+          fullResponseLog: true,
+          responseWhitelist: ['statusCode'],
+          next: function (req, res, next) {
+            res.write('{ "message":');
+            res.end(' "Hi!  I\'m a chunk!" }');
+          }
+        }
+      };
+      return loggerTestHelper(options).then(function (result) {
+        result.log.meta.res.should.not.have.property('body');
+      });
+    });
+  });
+
   describe('.responseWhitelist', function () {
     it('should be an array with all the properties whitelisted in the res object', function () {
       expressWinston.responseWhitelist.should.be.an.Array();

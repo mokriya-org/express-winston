@@ -78,6 +78,7 @@ Use `expressWinston.logger(options)` to create a middleware to log your HTTP req
     responseFilter: function (res, propName) { return res[propName]; } // A function to filter/return response values, defaults to returning all values allowed by whitelist. If the function returns undefined, the key/value will not be included in the meta.
     requestWhitelist: [String] // Array of request properties to log. Overrides global requestWhitelist for this instance
     responseWhitelist: [String] // Array of response properties to log. Overrides global responseWhitelist for this instance
+    fullResponseLog: Boolean // Log the entire buffered response body if responseWhitelist includes `body`. NOTE: Will entail buffering the entire response in memory.
     bodyWhitelist: [String] // Array of body properties to log. Overrides global bodyWhitelist for this instance
     bodyBlacklist: [String] // Array of body properties to omit from logs. Overrides global bodyBlacklist for this instance
     ignoredRoutes: [String] // Array of paths to ignore/skip logging. Overrides global ignoredRoutes for this instance
